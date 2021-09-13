@@ -266,13 +266,17 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		var message Message
 		json.Unmarshal(p, &message)
-		// fmt.Println(message.Msg, message.RoomId, message.Sender)
 		time := time.Now()
 		message.Time = time
 
 		// 데이터베이스에 저장
 		// err = db.QueryRow("insert into Message (sender, roomId, msg, time, senderEmail) values (?, ?, ?, ?, ?)", message.Sender, message.RoomId, message.Msg, time, message.SenderEmail).Err()
-		gormDB.Create(&Message{Sender: message.Sender, SenderEmail: message.SenderEmail, RoomId: message.RoomId, Msg: message.Msg, Time: time})
+		gormDB.Create(&Message{
+			Sender:      message.Sender,
+			SenderEmail: message.SenderEmail,
+			RoomId:      message.RoomId,
+			Msg:         message.Msg,
+			Time:        time})
 
 		if err != nil {
 			log.Printf("%v", err)
@@ -282,7 +286,7 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		// 저장이 되었다면 접속된 클라이언트에게 메세지 전송
 
 		for _, client := range clients {
-			client.conn.WriteMessage(messageType, messageToClient)
+			go client.conn.WriteMessage(messageType, messageToClient)
 		}
 
 	}
