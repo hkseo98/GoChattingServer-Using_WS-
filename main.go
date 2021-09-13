@@ -270,7 +270,6 @@ func socketHandler(w http.ResponseWriter, r *http.Request) {
 		message.Time = time
 
 		// 데이터베이스에 저장
-		// err = db.QueryRow("insert into Message (sender, roomId, msg, time, senderEmail) values (?, ?, ?, ?, ?)", message.Sender, message.RoomId, message.Msg, time, message.SenderEmail).Err()
 		gormDB.Create(&Message{
 			Sender:      message.Sender,
 			SenderEmail: message.SenderEmail,
